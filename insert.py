@@ -1,5 +1,7 @@
+import os
 import sqlite3
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 
 
 class InsertDatabase:
@@ -10,6 +12,10 @@ class InsertDatabase:
         self.exec = self.cur.execute
 
     def usr_in(self):
+
+        self.exec(
+            "CREATE TABLE IF NOT EXISTS passwords(application TEXT, username TEXT, password TEXT) ")
+
         app = input("Enter the application here -> ")
         usrname = input("Enter the username here -> ")
         passwd = input("Enter the password here -> ")
@@ -19,8 +25,8 @@ class InsertDatabase:
     def insert_into_db(self):
         app, usrname, passwd = self.usr_in()
 
-        key = Fernet.generate_key()
-
+        load_dotenv()
+        key = os.getenv("KEY")
         engine = Fernet(key)
 
         usrname_crypt = engine.encrypt(usrname)
@@ -34,8 +40,3 @@ class InsertDatabase:
     def db_close(self):
         self.cur.close()
         self.connecion.close()
-
-
-if __name__ == "__main__":
-    InsertDatabase("passwords.db").insert_into_db()
-    InsertDatabase("passwords.db").db_close()
